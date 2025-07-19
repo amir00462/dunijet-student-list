@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mockapi_flutter/models/user.dart';
+import 'package:mockapi_flutter/screens/user_edit_screen.dart';
 import 'package:mockapi_flutter/services/api_service.dart';
 import 'package:mockapi_flutter/widgets/user_list_item.dart';
 
@@ -43,6 +44,13 @@ class _UsersListScreenState extends State<UsersListScreen> {
     }
   }
 
+  void _navigateAndRefresh(Widget screen) async {
+    final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+    if (result == true) {
+      loadUsers();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double bottomPadding = MediaQuery.of(context).padding.bottom;
@@ -52,7 +60,9 @@ class _UsersListScreenState extends State<UsersListScreen> {
         child: Padding(
           padding: EdgeInsets.only(bottom: 16.0),
           child: FloatingActionButton.extended(
-            onPressed: () {},
+            onPressed: () {
+              _navigateAndRefresh(UserEditScreen());
+            },
             icon: Icon(Icons.add),
             label: Text('Add Student'),
           ),
@@ -92,7 +102,12 @@ class _UsersListScreenState extends State<UsersListScreen> {
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate((context, index) {
                         final user = users[index];
-                        return UserListItem(user: user, onTap: () {}, onDismissed: () {});
+                        return UserListItem(
+                          user: user, 
+                          onTap: () {
+                            _navigateAndRefresh(UserEditScreen(user: user))
+                          }, 
+                          onDismissed: () {});
                       }, childCount: users.length),
                     ),
                   ),
