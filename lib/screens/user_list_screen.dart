@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mockapi_flutter/models/user.dart';
 import 'package:mockapi_flutter/services/api_service.dart';
+import 'package:mockapi_flutter/widgets/user_list_item.dart';
 
 class UsersListScreen extends StatefulWidget {
   const UsersListScreen({super.key});
@@ -20,7 +21,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
     loadUsers();
   }
 
-  loadUsers() async {
+  Future<void> loadUsers() async {
     if (!mounted) return;
 
     setState(() {
@@ -77,9 +78,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
               ),
             )
           : RefreshIndicator(
-              onRefresh: () {
-                loadUsers();
-              },
+              onRefresh: loadUsers,
               child: CustomScrollView(
                 slivers: [
                   SliverAppBar(
@@ -93,7 +92,8 @@ class _UsersListScreenState extends State<UsersListScreen> {
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate((context, index) {
                         final user = users[index];
-                      }),
+                        return UserListItem(user: user, onTap: () {}, onDismissed: () {});
+                      }, childCount: users.length),
                     ),
                   ),
                 ],
