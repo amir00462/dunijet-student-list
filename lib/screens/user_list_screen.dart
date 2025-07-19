@@ -33,7 +33,9 @@ class _UsersListScreenState extends State<UsersListScreen> {
       users = await apiService.getUsers();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error fetching data: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error fetching data: $e'), backgroundColor: Colors.red));
       }
     }
 
@@ -48,6 +50,26 @@ class _UsersListScreenState extends State<UsersListScreen> {
     final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
     if (result == true) {
       loadUsers();
+    }
+  }
+
+  Future<void> deleteUser(String id) async {
+    if (!mounted) return;
+
+    try {
+      await apiService.deleteUser(id);
+      // await loadUsers(); // optional
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User deleted successfully'), backgroundColor: Colors.green),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error deleting user: $e'), backgroundColor: Colors.red));
+      }
     }
   }
 
@@ -103,11 +125,14 @@ class _UsersListScreenState extends State<UsersListScreen> {
                       delegate: SliverChildBuilderDelegate((context, index) {
                         final user = users[index];
                         return UserListItem(
-                          user: user, 
+                          user: user,
                           onTap: () {
-                            _navigateAndRefresh(UserEditScreen(user: user))
-                          }, 
-                          onDismissed: () {});
+                            _navigateAndRefresh(UserEditScreen(user: user));
+                          },
+                          onDismissed: () {
+                            deleteUser(user.id);
+                          },
+                        );
                       }, childCount: users.length),
                     ),
                   ),
